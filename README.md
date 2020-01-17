@@ -1,2 +1,2 @@
-# picoCTF2018
-My solutions and writeups for the picoCTF 2018
+# CTF Writeups
+My solutions and writeups for CTFs
