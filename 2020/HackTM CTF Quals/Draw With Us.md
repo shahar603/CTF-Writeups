@@ -9,7 +9,7 @@
 
 ## Solution
 
-### What's preventing us from getting the flag?
+## What's preventing us from getting the flag?
 
 This is the code that returns the flag (`/flag`):
 
@@ -75,7 +75,7 @@ if (!user || !isAdmin(user)) {
 
 ------
 
-### Bypassing isAdmin(u)
+## Bypassing isAdmin(u)
 
 ```javascript
 function isAdmin(u) {
@@ -89,7 +89,7 @@ If we try to login (`/login`) with the admin username: `hacktm` we get:
 
 `Invalid creds`
 
-Its due to `isValidUser()` in `/login`. It checks that:
+Its due to `isValidUser(u)` in `/login`. It checks that:
 
 ```javascript
 u.username.toUpperCase() !== config.adminUsername.toUpperCase()
@@ -98,4 +98,14 @@ u.username.toUpperCase() !== config.adminUsername.toUpperCase()
 So we need: 
 * `u.username.toUpperCase() !== config.adminUsername.toUpperCase()`
 * `username.toLowerCase() === adminUsername.toLowerCase()`
+
+Thankfully unicode provides us with characters that satify this conditaion:
+```
+"K".toUpperCase() = "K"
+"K".toLowerCase() = "k"
+```
+
+That means:
+
+`isValidUser("hacKtm")` is `true` and `isAdmin("hacKtm")` is `true` as well!
 
