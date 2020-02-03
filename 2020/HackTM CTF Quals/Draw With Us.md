@@ -109,3 +109,23 @@ That means:
 
 `isValidUser("hacKtm")` is `true` and `isAdmin("hacKtm")` is `true` as well!
 
+We POST to `/login`:
+
+```javascript
+{
+	"username": "hacKtm"
+}
+```
+
+we get the following JWT:
+
+```javascript
+{
+"status": "ok",
+ "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZiNzRmNWJmLTI0ZTQtNDhkMC1hNjhmLWFhY2RiMzM1MTE2YSIsImlhdCI6MTU4MDc2MTk5MH0.h4YUaSHGEkG1BcuY_Agx0Lt7bU6X779OnOC2dmcat04"
+    }
+}
+```
+
+Now we can update our rights!
