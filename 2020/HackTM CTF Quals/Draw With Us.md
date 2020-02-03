@@ -9,7 +9,9 @@
 
 ## Solution
 
-This is the code that returns the flag
+### What's preventing us from getting the flag?
+
+This is the code that returns the flag (`/flag`):
 
 ```javascript
   if (req.user.id == 0) {
@@ -34,19 +36,7 @@ let adminId = pwHash
 For `adminId` to be 0,  we need `target xor pwHash = 0` which means `target === pwHash`.
 
 * `target` is the md5 sum of `config.n`.
-* `pwHash` is `q*p` which are variables that are given as parameter.
-
-```javascript
-  let target = md5(config.n.toString());
-
-  let pwHash = md5(
-    bigInt(String(p))
-      .multiply(String(q))
-      .toString()
-  );
-  ```
-  
-Maybe given enough inputs and outputs we could've guessed `config.n`, but this would require too many requests.
+* `pwHash` is the md5 sum of `q*p` which are variables that are given as parameter.
 
 We need to get `config.n`.
 
@@ -82,3 +72,30 @@ if (!user || !isAdmin(user)) {
   return;
 }
 ```
+
+------
+
+### Bypassing isAdmin(u)
+
+```javascript
+function isAdmin(u) {
+  return u.username.toLowerCase() == config.adminUsername.toLowerCase();
+}
+```
+
+We need to make `username.toLowerCase() === adminUsername.toLowerCase()`.
+
+If we try to login (`/login`) with the admin username: `hacktm` we get:
+
+`Invalid creds`
+
+Its due to `isValidUser()` in `/login`. It checks that:
+
+```javascript
+u.username.toUpperCase() !== config.adminUsername.toUpperCase()
+````
+
+So we need: 
+* `u.username.toUpperCase() !== config.adminUsername.toUpperCase()`
+* `username.toLowerCase() === adminUsername.toLowerCase()`
+
