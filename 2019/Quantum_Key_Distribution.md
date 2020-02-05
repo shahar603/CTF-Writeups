@@ -60,7 +60,7 @@ Step 4:
 
 Alice and Bob send half of the bits to each other and verify they are the same. If Eve has interfered with the quantum channel. They'd disagree.
 
-Step 4:
+Step 5
 
 Alice and Bob use the bits that were left as an OTP.
 
@@ -98,18 +98,49 @@ response = requests.post(
    ).json()
 ```
 
-We also get an announcement, which is not part of the original algorithm. I originally thought it was the server trying to perform step 3 but couldn't figure out what it's response ment). Then I figured out the server doesn't implement step 3 and just send the flag xored with the first 128 bits that agree.
+We get the following response:
 
-We choose the useful bits
+```javascript
+{
+'basis': ['x', '+', '+', 'x', '+', '+', '+', '+', 'x', 'x', '+', 'x', '+', 'x', 'x', '+', '+', 'x', '+', '+', '+', '+', '+', 'x', 'x', 
+'+', '+', '+', '+', 'x', 'x', 'x', '+', '+', '+', 'x', '+', 'x', 'x', '+', '+', 'x', 'x', 'x', '+', '+', 'x', 'x', 'x', '+', 'x', '+', 'x', '+', 'x', '+', '+', '+', '+', '+', 'x', 'x', '+', '+', '+', 'x', '+', 'x', 'x', 'x', 'x', 'x', 'x', '+', 'x', 'x', '+', '+', '+', 'x', 'x', 'x', '+', 'x', 'x', '+', 'x', '+', 'x', 'x', 'x', 'x', 'x', '+', '+', 'x', 'x', '+', 'x', '+', '+', 'x', '+', '+', 'x', '+', '+', '+', 'x', 'x', '+', 'x', 'x', '+', 'x', '+', 'x', 'x', '+', '+', '+', 'x', '+', '+', 'x', '+', 'x', 'x', 'x', 'x', '+', '+', '+', '+', '+', 'x', '+', 'x', 'x', 'x', '+', 'x', '+', '+', '+', 'x', 'x', '+', '+', '+', '+', '+', '+', 'x', 'x', 'x', 'x', '+', 'x', '+', 'x', '+', '+', '+', 'x', '+', 'x', '+', '+', 'x', '+', '+', 'x', 'x', '+', 'x', '+', 'x', 'x', '+', '+', 'x', 'x', '+', 'x', '+', 'x', '+', '+', 'x', '+', '+', '+', '+', 'x', '+', '+', 'x', '+', '+', '+', '+', '+', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', '+', 'x', 'x', 'x', 'x', '+', '+', 'x', 'x', 'x', '+', '+', 'x', 'x', 'x', 'x', 'x', '+', '+', 'x', '+', '+', '+', '+', '+', 'x', 'x', 'x', '+', '+', '+', '+', '+', 'x', '+', 'x', 'x', 'x', '+', 'x', '+', 'x', 'x', 'x', '+', '+', 'x', 'x', '+', 'x', '+', '+', 'x', 'x', '+', 'x', 'x', '+', 'x', '+', '+', 'x', '+', '+', 'x', 'x', 'x', 'x', '+', '+', 'x', '+', 'x', '+', 'x', '+', 'x', '+', '+', '+', '+', 'x', 'x', '+', '+', '+', 'x', 'x', 'x', 'x', '+', '+', '+', '+', '+', '+', 'x', '+', '+', '+', 'x', 'x', 'x', '+', '+', '+', 'x', '+', '+', 'x', '+', '+', 'x', 'x', 'x', 'x', 'x', '+', '+', '+', '+', 'x', 'x', 'x', '+', '+', '+', '+', 'x', 'x', 'x', 'x', '+', '+', '+', '+', '+', '+', 'x', 'x', 'x', '+', 'x', 'x', '+', '+', 'x', '+', 'x', 'x', 'x', '+', '+', 'x', '+', 'x', '+', '+', '+', '+', '+', 'x', 'x', '+', '+', 'x', 'x', '+', 'x', '+', '+', '+', '+', 'x', '+', 'x', 'x', 'x', '+', 'x', 'x', '+', 'x', 'x', '+', 'x', '+', 'x', 'x', 'x', 'x', '+', '+', '+', '+', '+', '+', '+', 'x', '+', '+', '+', 'x', 'x', '+', '+', 'x', '+', 'x', 'x', 'x', 'x', 'x', '+', '+', '+', 'x', '+', 'x', 'x', '+', '+', '+', '+', 'x', '+', 'x', 'x', 'x', 'x', '+', '+', '+', '+', 'x', '+', 'x', 'x', '+', 'x', '+', 'x', '+', '+', 'x', '+', '+', '+', 'x', 'x', '+', '+', '+', '+', '+', '+', '+', '+', '+', '+', '+', 'x', 'x', 'x', 'x', 'x', 'x', '+', '+', 'x', '+', '+', '+', '+', 'x', 'x', 'x', 'x', 'x', 'x', 'x', '+', '+', '+', 'x', 'x', '+', 'x', 'x', 'x', 'x', '+', '+', '+', 'x', 'x', '+'],
+'announcement': '909c84644d36c14650f032b29d1dc48a'
+}
+```
 
+The response contains two fields:
 
-Xor the announcement with the OTP
+* `basis`: the list of bases that the server used to decode the qubits we've sent
+* `announcement`:  Not a part of the original algorithm. I originally thought it was the server trying to perform step 3 but couldn't figure out what it's response ment). Then I figured out the server doesn't implement step 3 and just send the flag xored with the first 128 bits that agree.
+
+Xor the announcement with the OTP:
+
+```python
+key = 0
+for i in range(len(bases)):
+    if bases[i] == server_bases[i]:
+        key *= 2
+        key += basis_vectors[bases[i]].index(qubits[i])
+```
 
 
 And get the flag
 
+```python
+key = ''
+for i in range(len(bases)):
+    if bases[i] == server_bases[i]:
+        key += str(basis_vectors[bases[i]].index(qubits[i]))
+        
+key = int(key[:128],2)
+announcement = int(response['announcement'],16)
 
+print(hex(key^announcement))        
+```
 
+result:
+
+`0x946cff6c9d9efed002233a6a6c7b83b1`
 
 -----
 
