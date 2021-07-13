@@ -146,7 +146,7 @@ result:
 
 ## A simpler solution
 
-To make sure Eve can't know the OTP. Both the bits and the basis have to be chosen randomly. If She can figure out the basis used. If Eve knows the basis, she can perform MiTM attack. But the sever doesn't check that.
+To make sure Eve can't know the OTP. Both the bits and the basis have to be chosen randomly. If Eve knows the basis, she can perform MiTM attack. But the sever doesn't check that.
 
 So let's generate a basis which is just +
 
